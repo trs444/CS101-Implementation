@@ -22,16 +22,16 @@ sourcecode : pub.ist.ac.at/~vnk/software/blossom5-v2.05.src.tar.gz
 
 */
 
-void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float** adjacentMatrix, int N) {
+void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float** adjacentMatrix, int numOddDegree) {
 	int e = 0;
-	node_num = N;
-	edge_num = N*(N-1)/2 ; //complete graph
+	node_num = numOddDegree;
+	edge_num = numOddDegree*(numOddDegree-1)/2 ; //complete graph
 
 	edges = new int[2*edge_num];
 	weights = new int[edge_num];
 
-	for(int i = 0; i < N ; ++i) {
-		for(int j = i+1 ; j< N ; ++j) {
+	for(int i = 0; i < numOddDegree; ++i) {
+		for(int j = i+1 ; j< numOddDegree ; ++j) {
 			edges[2*e] = i;
 			edges[2*e+1] = j;
 			weights[e] = adjacentMatrix[i][j];
