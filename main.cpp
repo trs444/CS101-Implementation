@@ -2,6 +2,9 @@
 #include "point.h"
 #include "MST.h"
 #include "Minmatching/PerfectMatching.h"
+#include <iterator>
+#include <vector>
+#include <iostream>
 
 /*
 This project is a starter code and wrappers for CSE101W15 Implementation project.
@@ -39,8 +42,11 @@ void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float**
 		}
 	}
 
-    /*for( int i = 0; i < numOddDegree; i++) {
-    	cout << edges[i] << endl;
+    /*for( int i = 0; i < numOddDegrees; i++) {
+    	cout << "blah: " << weights[i] << endl;
+    }
+    for ( int j = 0; j < edge_num*2; j++) {
+    	cout << "edges: " << edges[j] << endl;
     }*/
 	if (e != edge_num) { 
 		cout<<"the number of edge is wrong"<<endl;
@@ -64,14 +70,14 @@ int main() {
 	int W, H, N;
 	Point pointset;
 
-	W = 100;
-	H = 100;
-	N = 10;
+	W = 5000;
+	H = 3000;
+	N = 7000;
 
 	cout<<"W: "<<W<<" H: "<<H<<" N:"<<N<<endl;
 
 	pointset.generatePoint(W, H, N); //max(W,H,N) should be < 20000 because of memory limitation
-	pointset.printPointset();
+	//pointset.printPointset();
 
 	generatedPointset = pointset.getPointset();
 	adjacentMatrix = pointset.getAdjacentMatrix();
@@ -79,7 +85,7 @@ int main() {
 	//Deliverable A: From pointset and adjacentMatrix, you should construct MST with Prim or Kruskal
 	MST mst(adjacentMatrix, N);
 	mst.makeTree();
-	mst.printMST();
+	//mst.printMST();
 	int numOddDegrees = mst.findOddVertices();
 	int* oddArray = mst.whichOddVertices();
 	
@@ -110,8 +116,25 @@ int main() {
 	double cost = ComputePerfectMatchingCost(node_num, edge_num, edges, weights, pm);
 	printf("Total cost of the perfect min-weight matching = %.1f\n", cost);
 	
-	PrintMatching(node_num, pm, oddArray);
+	//PrintMatching(node_num, pm, oddArray);
 
+	std::vector<pair<int, int>> nGraph;
+	nGraph = mst.combine();
+	std::pair<int, int> nPair;
+	int q, t;
+
+	for (q=0; q<node_num; q++) {
+		t = pm->GetMatch(q);
+		//if (i < j) printf("%d %d\n", oddArray[i], oddArray[j]);
+		if(q < t) {
+			nPair = std::make_pair(oddArray[q], oddArray[t]);
+			nGraph.push_back(nPair);
+		}
+	}
+	for(std::vector<pair<int, int>>::iterator it = nGraph.begin(); it != nGraph.end(); ++it) {
+		//cout << "first value: " << it->first << endl;
+		//cout << "second value: " << it->second << endl;
+	}
 	delete pm;
 	delete [] edges;
 	delete [] weights;

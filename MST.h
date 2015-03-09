@@ -28,10 +28,8 @@ public:
 	float calStd(int option);
     int findOddVertices();
     int* whichOddVertices();
-
-private:
 	void minimumMatching();
-	void combine();
+	vector<std::pair<int, int>> combine();
 	int minKey(int key[], bool mstSet[]);
 
 };

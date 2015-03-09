@@ -27,6 +27,8 @@ void Point::generatePoint(unsigned int H, unsigned int W, unsigned int N) {
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
 	std::default_random_engine generator(seed);
+	//std::default_random_engine x_generator;
+	//std::default_random_engine y_generator;
 	std::uniform_int_distribution<int> x_distribution(0,H);
 	std::uniform_int_distribution<int> y_distribution(0,W);
 
