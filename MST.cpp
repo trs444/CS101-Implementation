@@ -6,9 +6,8 @@
 MST::MST(float** input, int size) {
 	adjacentMatrix = input;
 	key = new int[size];   
-    mstSet = new bool[size];  
+  mstSet = new bool[size];  
 	parent = new int[size];
-
 	N = size;
 }
 
@@ -232,36 +231,37 @@ int MST::findOddVertices() {
       numOddDegree++;
     }
   }
-
   return numOddDegree;
 
 
 }
 
-std::vector<int> MST::whichOddVertices() {
-   int degree [this->N]; 
+int* MST::whichOddVertices() {
+  
+  int degree [this->N];
+  
+  for(int i = 0; i < this->N; i++) {
+    degree[i] = 0;
+  } 
+  int currNode; 
+  for (int j = 1; j < this->N; j++) {
+    degree[parent[j]] += 1;
+    degree[j] += 1; 
+  }
 
-   for(int i = 0; i < this->N; i++) { 
-     degree[i] = 1; 
-   } 
-     
-   int currNode;                     
-   for(int j = 2; j < this->N; j++) { 
-     currNode = parent[j]; 
-     degree[currNode] += 1; 
-   } 
-     
-   int numOddDegree = 0;
-   for(int k = 0; k < this->N; k++) {
-     if(degree[k]%2 == 1) {
+  int numOddDegree = 0;
+  for(int k = 0; k < this->N; k++) {
+     if((degree[k]%2 == 1) || (degree[k] == 0)) {
        numOddDegree++;
      }
   }
 
-  std::vector<int> oddDegrees ;
+ int oddDegrees[numOddDegree];
+ int x = 0;
   for(int y = 0; y< this->N; y++) {
-    if(degree[y]%2 == 1) {
-      oddDegrees.push_back(y);
+    if(degree[y]%2 == 1 || degree[y] == 0) {
+      oddDegrees[x] = y;
+      x++;
     }
   }
 

@@ -22,16 +22,16 @@ sourcecode : pub.ist.ac.at/~vnk/software/blossom5-v2.05.src.tar.gz
 
 */
 
-void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float** adjacentMatrix, int numOddDegree) {
+void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float** adjacentMatrix, int numOddDegrees) {
 	int e = 0;
-	node_num = numOddDegree;
-	edge_num = numOddDegree*(numOddDegree-1)/2 ; //complete graph
+	node_num = numOddDegrees;
+	edge_num = numOddDegrees*(numOddDegrees-1)/2 ; //complete graph
 
 	edges = new int[2*edge_num];
 	weights = new int[edge_num];
 
-	for(int i = 0; i < numOddDegree; ++i) {
-		for(int j = i+1 ; j< numOddDegree ; ++j) {
+	for(int i = 0; i < numOddDegrees; ++i) {
+		for(int j = i+1 ; j< numOddDegrees ; ++j) {
 			edges[2*e] = i;
 			edges[2*e+1] = j;
 			weights[e] = adjacentMatrix[i][j];
@@ -39,6 +39,9 @@ void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float**
 		}
 	}
 
+    /*for( int i = 0; i < numOddDegree; i++) {
+    	cout << edges[i] << endl;
+    }*/
 	if (e != edge_num) { 
 		cout<<"the number of edge is wrong"<<endl;
 
@@ -46,12 +49,12 @@ void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float**
 	}
 }
 
-void PrintMatching(int node_num, PerfectMatching* pm) {
+void PrintMatching(int node_num, PerfectMatching* pm, int* oddArray) {
 	int i, j;
 
 	for (i=0; i<node_num; i++) {
 		j = pm->GetMatch(i);
-		if (i < j) printf("%d %d\n", i, j);
+		if (i < j) printf("%d %d\n", oddArray[i], oddArray[j]);
 	}
 }
 
@@ -77,23 +80,25 @@ int main() {
 	MST mst(adjacentMatrix, N);
 	mst.makeTree();
 	mst.printMST();
+	int numOddDegrees = mst.findOddVertices();
+	int* oddArray = mst.whichOddVertices();
 	
 
 	//Deliverable B: Find TSP2 path from the constructed MST
 	//You won't need any wrappers for B.
-  float TSP2Cost = mst.makeTSP2(0, pointset);
+    float TSP2Cost = mst.makeTSP2(0, pointset);
 
 
 	//Deliverable C: Find TSP1.5 path from the constructed MST
 	
 	//Find the perfect minimum-weight matching 
 	struct PerfectMatching::Options options;
-	int i, e, node_num = N, edge_num = N*(N-1)/2;
+	int i, e, node_num = numOddDegrees, edge_num = numOddDegrees*(numOddDegrees-1)/2;
 	int* edges;
 	int* weights;
 	PerfectMatching *pm = new PerfectMatching(node_num, edge_num);
 
-	LoadInput(node_num, edge_num, edges, weights, adjacentMatrix, N);
+	LoadInput(node_num, edge_num, edges, weights, adjacentMatrix, numOddDegrees);
 
 	for (e=0; e<edge_num; e++) {
 		pm->AddEdge(edges[2*e], edges[2*e+1], weights[e]);
@@ -105,7 +110,7 @@ int main() {
 	double cost = ComputePerfectMatchingCost(node_num, edge_num, edges, weights, pm);
 	printf("Total cost of the perfect min-weight matching = %.1f\n", cost);
 	
-	PrintMatching(node_num, pm);
+	PrintMatching(node_num, pm, oddArray);
 
 	delete pm;
 	delete [] edges;

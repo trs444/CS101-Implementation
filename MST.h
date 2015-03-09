@@ -27,7 +27,7 @@ public:
 	float calMean(int option);
 	float calStd(int option);
     int findOddVertices();
-    vector<int> whichOddVertices();
+    int* whichOddVertices();
 
 private:
 	void minimumMatching();
