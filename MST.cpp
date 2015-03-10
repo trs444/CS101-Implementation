@@ -8,7 +8,9 @@ MST::MST(float** input, int size) {
 	key = new int[size];   
   mstSet = new bool[size];  
 	parent = new int[size];
+  oddDegrees = new int[size];
 	N = size;
+  isOdd = new bool[N];
 }
 
 MST::~MST() {
@@ -117,10 +119,8 @@ float MST::makeTSP2(int startV, Point p) {
     visited[zz] = -99;
   }
   size_t visitedSize = sizeof(visited)/sizeof(int);
-  //cout << "visited size is " << visitedSize << endl;
   int *visitedEnd = visited + visitedSize; //size of array
   std::stack<int> order;
-  set< pair<int,int> > points = p.getPointset();
 
   order.push(startV); //push starting node on stack
 
@@ -132,144 +132,49 @@ float MST::makeTSP2(int startV, Point p) {
     mstVect.push_back(mstPair);
   }
  
-  //cout << "ENTERING WHILE LOOP startV = " << startV << endl;
   while(!order.empty()) { //when stack isn't emtpy, pop it
     startV = order.top();
-    //cout << "stack: " << order.top() << endl;
     order.pop();
 
-    //cout << "startV = " << startV <<endl;
-
-    //cout << "Entering if statement 1" << endl;
-
     if(std::find(visited, visitedEnd, startV) == visitedEnd) {
-      //visited[j] = startV;
-      //cout << visited[j] << " IS BEING VISITED**********************************************" << endl;
-      //j++;
-      //for(int i = 0; i < (this->N); i++) { //wrong?
-
-       // cout << "Entering if statement 2" << endl;
-
-        /*if((this->adjacentMatrix[startV][i] != 0) && (this->parent[i] == startV)) {
-          order.push(i);
-          //cout << "node " << i << " pushed to stack from node " << startV << endl;
-        }*/
-
-
-        //for(int ab = 0; ab <this->N; ab++) {
-          for(std::vector<pair<int, int>>::iterator it = mstVect.begin(); it != mstVect.end(); ++it) {
-            if(it->first == startV && std::find(visited, visitedEnd, it->second) == visitedEnd) {
-              order.push(it->second);
-            }
-            if(it->second == startV && std::find(visited, visitedEnd, it->first) == visitedEnd) {
-              order.push(it->first);
-            }
+      for(std::vector<pair<int, int>>::iterator it = mstVect.begin(); it != mstVect.end(); ++it) {
+        if(it->first == startV && std::find(visited, visitedEnd, it->second) == visitedEnd) {
+           order.push(it->second);
           }
-
-          visited[j] = startV;
-          j++;
-        //}
-
-      //}
-      //iterate through and find which vertices startV is connected to
+        if(it->second == startV && std::find(visited, visitedEnd, it->first) == visitedEnd) {
+           order.push(it->first);
+          }
+        }
+      visited[j] = startV;
+      j++;
     }
-
   }
 
   //print order visited
   cout << "NODES VISITED IN THIS ORDER:" << endl;
   for(int k = 0; k < (sizeof(visited)/sizeof(int)); k++) {
-    //cout << visited[k] << endl;
+    cout << visited[k] << endl;
   }
 
   int coordinates [2*(this->N)]; //Store coordinates for points
   int g = 0;
 
-  for(set< pair<int,int> >::iterator it = points.begin() ; it != points.end() ; ++it) {
-    coordinates[g] = (*it).first; //x-coord first
-    coordinates[g+1] = (*it).second; //y-coord
-    g += 2;
-  }
-
   float cost = 0; //initialize tsp2 cost
 
   //add shortcuts if a vertex has no detours
   //calculate heuristic TSP cost
-  std::pair<int, int> pair1;
-  std::pair<int, int> pair2;
 
   for(int m = 0; m < this->N-1; m++) {
-    //cost += p.getEuclideanDistance(coordinates[visited[m]*2], coordinates[(visited[m]*2)+1], coordinates[visited[m+1]*2], coordinates[(visited[m+1]*2)+1]);
     cost += adjacentMatrix[visited[m]][visited[m+1]];
     //cout << "edge cost between " << visited[m] << " and " << visited[m+1] << " = " << p.getEuclideanDistance(coordinates[visited[m]*2], coordinates[(visited[m]*2)+1], coordinates[visited[m+1]*2], coordinates[(visited[m+1]*2)+1]) << endl;
     
   }
   cost += (float)adjacentMatrix[visited[0]][visited[this->N-1]];
   //cout << "final edge cost is (correct) " << adjacentMatrix[visited[0]][visited[this->N-1]] << endl;
-  //cost += p.getEuclideanDistance(coordinates[0], coordinates[1], coordinates[(visited[this->N-1]*2)], coordinates[visited[((this->N-1)*2)+1]]);
-  //cout << "cost of final edge is " << p.getEuclideanDistance(coordinates[0], coordinates[1], coordinates[(visited[this->N-1]*2)], coordinates[visited[((this->N-1)*2)+1]]) << endl;
-    //cout << "TSP2 Cost: " << cost << endl;
-    //cout << "blah" << endl;
-    /*for( std::vector<pair<int, int>>::iterator it = mstVect.begin(); it != mstVect.end(); ++it) {
-      pair1 = std::make_pair(visited[m], visited[m+1]);
-      pair2 = std::make_pair(visited[m+1], visited[m]);
-      //cout << "pair1 first: " << pair1.first << endl;
-      //cout << "pair1 second: " << pair1.second << endl;
-      //cout << "visited[m]" << visited[m] << endl;
-      //cout << "visited[m+1] " << visited[m+1] << endl;
-      if(mstVect[m] == pair1 || mstVect[m] == pair2) {
-        cost += (float)adjacentMatrix[pair1.first][pair1.second];
-        //cost += (float)key[visited[m+1]];
-        break;
-      }
-    /*if(parent[visited[m+1]] == visited[m]) {
-      cost += (float)key[visited[m+1]];
-      cout << "if" << endl;
-    //}
-    else{
-      //cout << "else" << endl;
-      //cout << "no edge, creating" << endl;
-      cost += p.getEuclideanDistance(coordinates[visited[m]*2], coordinates[(visited[m]*2)+1], coordinates[visited[m+1]*2], coordinates[(visited[m+1]*2)+1]);
-      break;
-      
-      //cout << coordinates[visited[m]*2] << endl;
-      //cout << coordinates[(visited[m]*2)+1] << endl;
-      //cout << coordinates[visited[m+1]*2] << endl;
-      //cout << coordinates[(visited[m+1]*2)+1] << endl;
-    }
-  }*/
-  //}
-
-  //check case if there's an edge form first to last node
-
-
-  /*for(int n = 0; n < this->N-1; n++) {
-    for( std::vector<pair<int, int>>::iterator it = mstVect.begin(); it != mstVect.end(); ++it) {
-        pair1 = std::make_pair(visited[0], visited[this->N-1]);
-        pair2 = std::make_pair(visited[this->N-1], visited[0]);
-        if(mstVect[n] == pair1 || mstVect[n] == pair2) {
-          cout << "THERE'S ALREADY AN EXISTING EDGE FROM THE FIRST TO THE LAST NODE" << endl;
-        }
-        else{                                                                       
-          //cost += p.getEuclideanDistance(coordinates[0], coordinates[1], coordinates[(this->N*2)-2], coordinates[(this->N*2)-1]);
-          break;
-        }     
-    }
-  }*/  
-
-
-  /*if(parent[visited[this->N-1]] == visited[0]) {
-    cout << "THERE'S ALREADY AN EXISTING EDGE FROM THE FIRST TO THE LAST NODE" << endl;
-  }      
-  else{      
-        cout << "blah" << endl;                                                                 
-        //cost += p.getEuclideanDistance(coordinates[0], coordinates[1], coordinates[(this->N*2)-2], coordinates[(this->N*2)-1]);
-      }*/                                                                       
-            
+                                                                                   
 
   int keySum = 0;
   for(int z = 0; z < this->N; z++) {
-    //cout << "key at " << z << " is: " << key[z] << endl;
     keySum += key[z];
   }
 
@@ -283,9 +188,9 @@ float MST::makeTSP2(int startV, Point p) {
 
 
 
-int MST::findOddVertices() {
+int MST::numOfOdd() {
  
-  int degree [this->N];
+  /*int degree [this->N];
 
   for(int i = 0; i < this->N; i++) {
     degree[i] = 1;
@@ -303,16 +208,32 @@ int MST::findOddVertices() {
       numOddDegree++;
     }
   }
-  return numOddDegree;
-
+  return numOddDegree;*/
+  int odd = 0;
+  for(int i = 0; i < N; i++) {
+    if(isOdd[i] == 1) {
+      odd++;
+    }
+  }
+  return odd;
 
 }
 
 int* MST::whichOddVertices() {
+  int oddNum = numOfOdd();
+
+  oddDegrees[oddNum];
+  int j = 0;
+  for( int i = 0; i < N; i++) {
+    if(isOdd[i] == true) {
+      oddDegrees[j] = i;
+      j++;
+    }
+  }
+  return oddDegrees;
+  //int degree [this->N];
   
-  int degree [this->N];
-  
-  for(int i = 0; i < this->N; i++) {
+  /*for(int i = 0; i < this->N; i++) {
     degree[i] = 0;
   } 
   int currNode; 
@@ -326,9 +247,9 @@ int* MST::whichOddVertices() {
      if((degree[k]%2 == 1) || (degree[k] == 0)) {
        numOddDegree++;
      }
-  }
+  }*/
 
- int oddDegrees[numOddDegree];
+ /*oddDegrees[numOddDegree];
  int x = 0;
   for(int y = 0; y< this->N; y++) {
     if(degree[y]%2 == 1 || degree[y] == 0) {
@@ -337,11 +258,33 @@ int* MST::whichOddVertices() {
     }
   }
 
+  cout<<"NUM ODD DEGREE:" << numOddDegree<<endl;
   for( int q = 0; q < numOddDegree; q++) {
-    //cout << "odd node: " << oddDegrees[q] << endl;
-  }
-  return oddDegrees;
+    cout << "odd node: " << oddDegrees[q] << endl;
+  }*/
+  //return oddDegrees;
 
+}
+void MST::findOddNode() {
+  int * count = new int[N];
+  for( int i = 0; i < N; i++) {
+    count[i] = 0;
+    isOdd[i] = false;
+  }
+  for( int i = 1; i < N; i++) {
+    count[i]++;
+  }
+  for(int i = 0; i < N; i++) {
+    count[parent[i]]++;
+  }
+  for( int i = 0; i < N; i++) {
+    if( count[i] % 2 != 0 ) {
+      isOdd[i] = true;
+    }
+  }
+  /*for( int i = 0; i < N; i++) {
+    cout << isOdd[i] << endl;
+  }*/
 }
 
 

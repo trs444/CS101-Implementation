@@ -25,7 +25,7 @@ sourcecode : pub.ist.ac.at/~vnk/software/blossom5-v2.05.src.tar.gz
 
 */
 
-void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float** adjacentMatrix, int numOddDegrees) {
+void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float** adjacentMatrix, int numOddDegrees, int* oddArray) {
 	int e = 0;
 	node_num = numOddDegrees;
 	edge_num = numOddDegrees*(numOddDegrees-1)/2 ; //complete graph
@@ -37,13 +37,13 @@ void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float**
 		for(int j = i+1 ; j< numOddDegrees ; ++j) {
 			edges[2*e] = i;
 			edges[2*e+1] = j;
-			weights[e] = adjacentMatrix[i][j];
+			weights[e] = adjacentMatrix[oddArray[i]][oddArray[j]];
 			e++;
 		}
 	}
 
-    /*for( int i = 0; i < numOddDegrees; i++) {
-    	cout << "blah: " << weights[i] << endl;
+    /*for( int i = 0; i < edge_num; i++) {
+    	cout << "weight: " << weights[i] << endl;
     }
     for ( int j = 0; j < edge_num*2; j++) {
     	cout << "edges: " << edges[j] << endl;
@@ -58,10 +58,15 @@ void LoadInput(int& node_num, int& edge_num, int*& edges, int*& weights, float**
 void PrintMatching(int node_num, PerfectMatching* pm, int* oddArray) {
 	int i, j;
 
-	for (i=0; i<node_num; i++) {
+	for (i = 0; i < node_num; i++) {
 		j = pm->GetMatch(i);
+		//cout << "i: " << oddArray[i] << endl;
+		//cout << "j: " << oddArray[j] << endl;
 		if (i < j) printf("%d %d\n", oddArray[i], oddArray[j]);
 	}
+	/*for( int i = 0; i < node_num; i++) {
+		cout << "oddArray: " << oddArray[i] << endl;
+	}*/
 }
 
 int main() {
@@ -69,15 +74,17 @@ int main() {
 	float** adjacentMatrix;
 	int W, H, N;
 	Point pointset;
+	int numOddDegrees;
+	int* oddArray;
 
-	W = 5000;
-	H = 3000;
-	N = 7000;
+	W = 100;
+	H = 100;
+	N = 10;
 
 	cout<<"W: "<<W<<" H: "<<H<<" N:"<<N<<endl;
 
 	pointset.generatePoint(W, H, N); //max(W,H,N) should be < 20000 because of memory limitation
-	//pointset.printPointset();
+	pointset.printPointset();
 
 	generatedPointset = pointset.getPointset();
 	adjacentMatrix = pointset.getAdjacentMatrix();
@@ -85,10 +92,12 @@ int main() {
 	//Deliverable A: From pointset and adjacentMatrix, you should construct MST with Prim or Kruskal
 	MST mst(adjacentMatrix, N);
 	mst.makeTree();
-	//mst.printMST();
-	int numOddDegrees = mst.findOddVertices();
-	int* oddArray = mst.whichOddVertices();
-	
+	mst.printMST();
+	mst.findOddNode();
+	numOddDegrees = mst.numOfOdd();
+
+	oddArray = mst.whichOddVertices();
+	cout<<"NUM ODD DEGREEasdfwerrf:" << numOddDegrees<<endl;
 
 	//Deliverable B: Find TSP2 path from the constructed MST
 	//You won't need any wrappers for B.
@@ -104,7 +113,7 @@ int main() {
 	int* weights;
 	PerfectMatching *pm = new PerfectMatching(node_num, edge_num);
 
-	LoadInput(node_num, edge_num, edges, weights, adjacentMatrix, numOddDegrees);
+	LoadInput(node_num, edge_num, edges, weights, adjacentMatrix, numOddDegrees, oddArray);
 
 	for (e=0; e<edge_num; e++) {
 		pm->AddEdge(edges[2*e], edges[2*e+1], weights[e]);
@@ -116,7 +125,7 @@ int main() {
 	double cost = ComputePerfectMatchingCost(node_num, edge_num, edges, weights, pm);
 	printf("Total cost of the perfect min-weight matching = %.1f\n", cost);
 	
-	//PrintMatching(node_num, pm, oddArray);
+	PrintMatching(node_num, pm, oddArray);
 
 	std::vector<pair<int, int>> nGraph;
 	nGraph = mst.combine();
@@ -128,12 +137,14 @@ int main() {
 		//if (i < j) printf("%d %d\n", oddArray[i], oddArray[j]);
 		if(q < t) {
 			nPair = std::make_pair(oddArray[q], oddArray[t]);
+			//cout << "oddQ: " << oddArray[q] << endl;
+			//cout << "oddT: " << oddArray[t] << endl;
 			nGraph.push_back(nPair);
 		}
 	}
 	for(std::vector<pair<int, int>>::iterator it = nGraph.begin(); it != nGraph.end(); ++it) {
-		//cout << "first value: " << it->first << endl;
-		//cout << "second value: " << it->second << endl;
+		cout << "first value: " << it->first << endl;
+		cout << "second value: " << it->second << endl;
 	}
 	delete pm;
 	delete [] edges;
