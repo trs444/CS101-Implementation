@@ -97,7 +97,7 @@ int main() {
 	numOddDegrees = mst.numOfOdd();
 
 	oddArray = mst.whichOddVertices();
-	cout<<"NUM ODD DEGREEasdfwerrf:" << numOddDegrees<<endl;
+	cout<<"NUM ODD DEGREE:" << numOddDegrees<<endl;
 
 	//Deliverable B: Find TSP2 path from the constructed MST
 	//You won't need any wrappers for B.
