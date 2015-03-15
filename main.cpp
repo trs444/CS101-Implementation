@@ -62,7 +62,7 @@ void PrintMatching(int node_num, PerfectMatching* pm, int* oddArray) {
 		j = pm->GetMatch(i);
 		//cout << "i: " << oddArray[i] << endl;
 		//cout << "j: " << oddArray[j] << endl;
-		if (i < j) printf("%d %d\n", oddArray[i], oddArray[j]);
+		//if (i < j) printf("%d %d\n", oddArray[i], oddArray[j]);
 	}
 	/*for( int i = 0; i < node_num; i++) {
 		cout << "oddArray: " << oddArray[i] << endl;
@@ -79,7 +79,7 @@ int main() {
 
 	W = 100;
 	H = 100;
-	N = 10;
+	N = 8;
 
 	cout<<"W: "<<W<<" H: "<<H<<" N:"<<N<<endl;
 
@@ -97,7 +97,7 @@ int main() {
 	numOddDegrees = mst.numOfOdd();
 
 	oddArray = mst.whichOddVertices();
-	cout<<"NUM ODD DEGREE:" << numOddDegrees<<endl;
+	//cout<<"NUM ODD DEGREE:" << numOddDegrees<<endl;
 
 	//Deliverable B: Find TSP2 path from the constructed MST
 	//You won't need any wrappers for B.
@@ -127,7 +127,7 @@ int main() {
 	
 	PrintMatching(node_num, pm, oddArray);
 
-	std::vector<pair<int, int>> nGraph;
+	/*std::vector<pair<int, int>> nGraph;
 	nGraph = mst.combine();
 	std::pair<int, int> nPair;
 	int q, t;
@@ -145,7 +145,11 @@ int main() {
 	for(std::vector<pair<int, int>>::iterator it = nGraph.begin(); it != nGraph.end(); ++it) {
 		cout << "first value: " << it->first << endl;
 		cout << "second value: " << it->second << endl;
-	}
+	}*/
+    //std::vector<pair<int, int>> nGraph;
+    //nGraph = mst.combine(pm, oddArray);
+    mst.makeTSP1_5(pm, oddArray, pointset);
+
 	delete pm;
 	delete [] edges;
 	delete [] weights;
