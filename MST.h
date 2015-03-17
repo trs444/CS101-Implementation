@@ -25,6 +25,7 @@ public:
 	bool combineFlag = true;
 	bool end = false;
 	bool here = false;
+	int numO;
 
 	MST(float** adjacentMatrix, int size);
 	~MST();
