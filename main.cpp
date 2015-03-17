@@ -111,7 +111,6 @@ int main() {
 	int i, e, node_num = numOddDegrees, edge_num = numOddDegrees*(numOddDegrees-1)/2;
 	int* edges;
 	int* weights;
-	int o = 1;
 	PerfectMatching *pm = new PerfectMatching(node_num, edge_num);
 
 	LoadInput(node_num, edge_num, edges, weights, adjacentMatrix, numOddDegrees, oddArray);
