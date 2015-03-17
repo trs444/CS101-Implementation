@@ -111,7 +111,8 @@ float MST::calStd(int option) {
 
 float MST::makeTSP2(int startV, Point p) {
 	//make a Eulerian tour by DFS
-  cout << "ENTERING MAKETSP2" << endl;
+  //cout << "ENTERING MAKETSP2" << endl;
+  cout << " " << endl;
   int visited [this->N]; //keeps track of what nodes we've seen
   for(int zz = 0; zz < this->N; zz++) {
     visited[zz] = -99;
